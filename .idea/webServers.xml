@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="82c6b208-ce2f-43f6-b9a8-17d4d3e9755c" name="sxg">
+        <fileTransfer rootFolder="/root/code/3/redis-table" accessType="SFTP" host="175.178.132.26" port="22" sshConfigId="6610a93b-1fa9-44bf-bdfd-cc7d0853fba8" sshConfig="root@175.178.132.26:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

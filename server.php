@@ -17,8 +17,22 @@ $server->on('connect', function ($server, $fd){
 
 });
 
-$server->on('receive', function ($server, $fd, $reactor_id, $data) {
-    print_r($data);
+static $connectionData = [];
+
+$server->on('receive', function ($server, $fd, $reactor_id, $data) use (&$connectionData) {
+    $data = json_decode($data, true);
+    $action = $data['action'];
+    $key = rtrim($data["key"]);
+    if ($action == "set") {
+        $val = rtrim($data["val"]);
+        $connectionData[$key] = $val;
+    } else if ($action == "get") {
+        if (isset($connectionData[$key]) && $connectionData[$key]) {
+            $server->send($fd, json_encode(['code' => 200, 'data' => $connectionData[$key]]));
+        } else {
+            $server->send($fd, json_encode(['code' => 404, 'data' => 'data not found']));
+        }
+    }
 });
 
 $server->on('close', function ($server, $fd) {

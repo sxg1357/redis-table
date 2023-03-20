@@ -10,8 +10,7 @@ $fp = stream_socket_client("tcp://127.0.0.1:9501", $error_code, $error_message, 
 
 Swoole\Event::add($fp, function ($fp) {
     $data = fread($fp, 1024);
-    print_r($data);
-    echo PHP_EOL;
+    print_r(json_decode($data, true));
 });
 
 Swoole\Event::add(STDIN, function ($fd) use ($fp) {
@@ -22,7 +21,7 @@ Swoole\Event::add(STDIN, function ($fd) use ($fp) {
         if (in_array($data[0], ['get', 'set'])) {
             $send = ['action' => $data[0], 'key' => $key];
             if ($data[0] == 'set') {
-                $val = $data[2];
+                $val = rtrim($data[2]);
                 $send['val'] = $val;
             }
             fwrite($fp, json_encode($send));

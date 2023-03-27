@@ -17,16 +17,16 @@ Swoole\Event::add(STDIN, function ($fd) use ($fp) {
     $data = fgets($fd, 1024);
     if ($data) {
         $data = explode(" ", $data);
-        $key = $data[1];
+        $key = trim($data[1]);
         if (in_array($data[0], ['get', 'set'])) {
             $send = ['action' => $data[0], 'key' => $key];
             if ($data[0] == 'set') {
-                $val = rtrim($data[2]);
+                $val = trim($data[2]);
                 $send['val'] = $val;
             }
             fwrite($fp, json_encode($send));
-        } else {
-            exit;
         }
     }
 });
+
+Swoole\Event::wait();

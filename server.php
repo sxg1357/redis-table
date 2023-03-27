@@ -42,6 +42,8 @@ $server->on('receive', function ($server, $fd, $reactor_id, $data) {
                 $key = $data['key'];
                 if (isset($connectionData[$key]) && $connectionData[$key]) {
                     $server->send($fd, json_encode(['code' => 200, 'val' => $connectionData[$key]]));
+                } else {
+                    $server->send($fd, json_encode(['code' => '404', 'msg' => 'not found']));
                 }
                 break;
             default:

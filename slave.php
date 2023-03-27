@@ -30,7 +30,6 @@ $process = new Swoole\Process(function () use ($server) {
             $data = json_decode($data, true);
             if (isset($data['key'])) {
                 $server->table->set($data['key'], ['data' => $data['val']]);
-                print_r($server->table->get($data['key']));
             }
         }
     });
@@ -44,7 +43,13 @@ $server->on('connect', function ($server, $fd) {
 });
 
 $server->on('receive', function ($server, $fd, $reactor_id, $data) {
-
+    $data = json_decode($data, true);
+    if (isset($data['key'])) {
+        $val = $server->table->get($data['key']);
+        $server->send($fd, json_encode(['code' => '200', 'val' => $val['data']]));
+    } else {
+        $server->send($fd, json_encode(['code' => '404', 'msg' => 'not found']));
+    }
 });
 
 $server->on('close', function ($server, $fd) {

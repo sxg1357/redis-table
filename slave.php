@@ -7,6 +7,7 @@
  */
 
 $server = new Swoole\Server('0.0.0.0', 9502);
+$server->set(['worker_num' => '1']);
 $table = new Swoole\Table(128);
 $table->column('data', Swoole\Table::TYPE_STRING, 1024);
 $table->create();

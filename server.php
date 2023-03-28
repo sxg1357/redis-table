@@ -29,9 +29,9 @@ $server->on('receive', function ($server, $fd, $reactor_id, $data) {
         $replicationFd[] = $fd;
         $server->send($fd, json_encode(['code' => 200, 'msg' => 'set ok']));
     } else {
+        $key = $data['key'];
         switch ($action) {
             case "set":
-                $key = $data['key'];
                 $val = $data['val'];
                 $connectionData[$key] = $val;
                 foreach ($replicationFd as $fdx) {
@@ -39,11 +39,11 @@ $server->on('receive', function ($server, $fd, $reactor_id, $data) {
                 }
                 break;
             case "get":
-                $key = $data['key'];
+                $fdx = $data['fdx'];
                 if (isset($connectionData[$key]) && $connectionData[$key]) {
-                    $server->send($fd, json_encode(['code' => 200, 'val' => $connectionData[$key]]));
+                    $server->send($fd, json_encode(['action' => 'response', 'code' => 200, 'val' => $connectionData[$key], 'fdx' => $fdx]));
                 } else {
-                    $server->send($fd, json_encode(['code' => '404', 'msg' => 'not found']));
+                    $server->send($fd, json_encode(['action' => 'response', 'code' => '404', 'val' => 'not found', 'fdx' => $fdx]));
                 }
                 break;
             default:

@@ -6,7 +6,7 @@
  * Time: 15:29
  */
 
-$fp = stream_socket_client("tcp://127.0.0.1:9501", $error_code, $error_message, 30);
+$fp = stream_socket_client("tcp://127.0.0.1:9503", $error_code, $error_message, 30);
 
 Swoole\Event::add($fp, function ($fp) {
     $data = fread($fp, 1024);

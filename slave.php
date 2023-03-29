@@ -45,12 +45,18 @@ $server->on('connect', function ($server, $fd) {
 
 $server->on('receive', function ($server, $fd, $reactor_id, $data) {
     $data = json_decode($data, true);
-    if (isset($data['key'])) {
-        $val = $server->table->get($data['key']);
-        $server->send($fd, json_encode(['code' => '200', 'val' => $val['data']]));
+    $key = $data['key'];
+    if ($server->table->exists($key)) {
+        $val = $server->table->get($key)['data'];
+        $code = '200';
     } else {
-        $server->send($fd, json_encode(['code' => '404', 'msg' => 'not found']));
+        $val = 'not found';
+        $code = '404';
     }
+    $data['code'] = $code;
+    $data['val'] = $val;
+    $data['action'] = 'response';
+    $server->send($fd, json_encode($data));
 });
 
 $server->on('close', function ($server, $fd) {

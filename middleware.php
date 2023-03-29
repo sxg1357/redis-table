@@ -23,7 +23,10 @@ $process = new Swoole\Process(function ($process) use ($server) {
         $data = json_decode($socket->recv(1024), true);
         print_r($data);
         if ($data['action'] == 'get') {
-            fwrite($masterFd, json_encode($data));
+            $fds = [$masterFd, $slaveFd];
+            $num = mt_rand(0, 1);
+            echo "num:$num".PHP_EOL;
+            fwrite($fds[$num], json_encode($data));
         } else if ($data['action'] == 'set') {
             fwrite($masterFd, json_encode($data));
         }
@@ -41,8 +44,16 @@ $process = new Swoole\Process(function ($process) use ($server) {
         }, SWOOLE_EVENT_WRITE);
     });
 
-    Swoole\Event::add($slaveFd, function ($slaveFd) {
+    Swoole\Event::add($slaveFd, function ($slaveFd) use ($fd) {
         $data = fread($slaveFd, 1024);
+        if ($data == '') {
+            Swoole\Event::del($slaveFd);
+            fclose($slaveFd);
+        }
+        Swoole\Event::add($fd, function() {}, function ($fd) use ($data) {
+            fwrite($fd, $data);
+            Swoole\Event::del($fd);
+        }, SWOOLE_EVENT_WRITE);
 
     });
     Swoole\Event::wait();
